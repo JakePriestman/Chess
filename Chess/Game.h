@@ -23,8 +23,7 @@ public:
 	
 	void Init(int width, int height, const char* title, int fps);
 	void InitPieces();
-	void HandleSound(bool exchange, Piece* king);
-	bool HasCastled(Piece* king, Square* move);
+	void HandleSound(bool exchange, Piece* king, bool kingHasMoved);
 	void HandleEvents();
 	void Render();
 	void Clean();

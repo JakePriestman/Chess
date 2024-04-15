@@ -20,37 +20,39 @@ void Game::InitPieces()
 	board.squares[63]->piece = new Rook{ 7, 7, "WHITE", board.squareWidth, board.squareHeight };
 
 	//Initialize Bishops
-	board.squares[2]->piece = new Bishop{ 2, 0, "BLACK", board.squareWidth, board.squareHeight };
-	board.squares[5]->piece = new Bishop{ 5, 0, "BLACK", board.squareWidth, board.squareHeight };
-	board.squares[2 + 7*8]->piece = new Bishop{2, 7, "WHITE", board.squareWidth, board.squareHeight};
-	board.squares[5 + 7*8]->piece = new Bishop{5, 7, "WHITE", board.squareWidth, board.squareHeight};
-
-	//Initialize Queens
-	board.squares[3]->piece = new Queen{ 3, 0, "BLACK", board.squareWidth, board.squareHeight };
-	board.squares[3 + 7 * 8]->piece = new Queen{ 3, 7, "WHITE", board.squareWidth, board.squareHeight };
-
-	//Initialize Knights
-	board.squares[1]->piece = new Knight{ 1, 0, "BLACK", board.squareWidth, board.squareHeight };
-	board.squares[6]->piece = new Knight{ 6, 0, "BLACK", board.squareWidth, board.squareHeight };
-	board.squares[1 + 7 * 8]->piece = new Knight{ 1, 7, "WHITE", board.squareWidth, board.squareHeight };
-	board.squares[6 + 7 * 8]->piece = new Knight{ 6, 7, "WHITE", board.squareWidth, board.squareHeight };
+//	board.squares[2]->piece = new Bishop{ 2, 0, "BLACK", board.squareWidth, board.squareHeight };
+//	board.squares[5]->piece = new Bishop{ 5, 0, "BLACK", board.squareWidth, board.squareHeight };
+//	board.squares[2 + 7*8]->piece = new Bishop{2, 7, "WHITE", board.squareWidth, board.squareHeight};
+//	board.squares[5 + 7*8]->piece = new Bishop{5, 7, "WHITE", board.squareWidth, board.squareHeight};
+//
+//	//Initialize Queens
+//	board.squares[3]->piece = new Queen{ 3, 0, "BLACK", board.squareWidth, board.squareHeight };
+//	board.squares[3 + 7 * 8]->piece = new Queen{ 3, 7, "WHITE", board.squareWidth, board.squareHeight };
+//
+//	//Initialize Knights
+//	board.squares[1]->piece = new Knight{ 1, 0, "BLACK", board.squareWidth, board.squareHeight };
+//	board.squares[6]->piece = new Knight{ 6, 0, "BLACK", board.squareWidth, board.squareHeight };
+//	board.squares[1 + 7 * 8]->piece = new Knight{ 1, 7, "WHITE", board.squareWidth, board.squareHeight };
+//	board.squares[6 + 7 * 8]->piece = new Knight{ 6, 7, "WHITE", board.squareWidth, board.squareHeight };
 }
 
-void Game::HandleSound(bool exchange, Piece* king)
+void Game::HandleSound(bool exchange, Piece* king, bool kingHasMoved)
 {
 	if (exchange)
 	{
 		if (king->isInCheck)
 			PlaySound(checkSound);
-		PlaySound(captureSound);
+		else
+			PlaySound(captureSound);
 	}
 	else
 	{
-		/*if (activePiece->GetType() == "KING" && (move->x == activePiece->posX + 2 || move->x == activePiece->posX - 2))
-			PlaySound(castleSound);*/
+		if (activePiece->GetType() == "KING" && (activePiece->posX == 2 || activePiece->posX == 6) && !kingHasMoved)
+			PlaySound(castleSound);
 
-	 if (king->isInCheck)
+		else if (king->isInCheck)
 			PlaySound(checkSound);
+
 		else
 			PlaySound(moveSound);
 	}
@@ -90,8 +92,8 @@ void Game::HandleEvents()
 	{
 		if (square->piece != nullptr)
 		{
-			//if(square->piece->validMoves.empty())
-			//	square->piece->CalculatePossibleMoves(board.squares, true); //Calculate all moves if the valid moves have been emptied
+			if(square->piece->validMoves.empty())
+				square->piece->CalculatePossibleMoves(board.squares, true); //Calculate all moves if the valid moves have been emptied
 
 			if (!activePiece) //We clicked on a piece
 			{
@@ -134,6 +136,11 @@ void Game::HandleEvents()
 			if (std::find(activePiece->validMoves.begin(), activePiece->validMoves.end(), move) != activePiece->validMoves.end())
 			{
 				bool exchange = move->piece;
+				bool kingHasMoved = false;
+
+				if (activePiece->name == "KING")
+					kingHasMoved = static_cast<King*>(activePiece)->hasMoved;
+					
 
 				activePiece->Move(move, board.squares);
 
@@ -149,7 +156,7 @@ void Game::HandleEvents()
 				otherKing->SetCheck(move, board.squares);
 				king->SetCheck(move, board.squares);
 
-				HandleSound(exchange, otherKing);
+				HandleSound(exchange, otherKing, kingHasMoved);
 
 				activePiece = nullptr;
 				_turn = _turn == "WHITE" ? "BLACK" : "WHITE";
