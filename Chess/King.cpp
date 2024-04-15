@@ -6,7 +6,7 @@ King::King(int x, int y, const char* colour, int squareWidth, int squareHeight) 
 {
 	source = colour == "WHITE" ? KING_WHITE : KING_BLACK;
 	name = "KING";
-	_hasMoved = false;
+	hasMoved = false;
 	isInCheck = false;
 }
 
@@ -29,12 +29,12 @@ void King::CalculatePossibleMoves(Square* squares[64], bool checkCheck)
 		}
 	}
 
-	if (!_hasMoved && squares[posX+1 + 8*posY]->piece == nullptr && squares[posX + 2 + 8 * posY]->piece == nullptr)
+	if (!hasMoved && squares[posX+1 + 8*posY]->piece == nullptr && squares[posX + 2 + 8 * posY]->piece == nullptr)
 	{
 		AddMove(squares, squares[posX + 2 + 8 * posY], checkCheck);
 	}
 
-	if (!_hasMoved && squares[posX - 1 + 8 * posY]->piece == nullptr && squares[posX - 2 + 8 * posY]->piece == nullptr && squares[posX - 3 + 8 * posY]->piece == nullptr)
+	if (!hasMoved && squares[posX - 1 + 8 * posY]->piece == nullptr && squares[posX - 2 + 8 * posY]->piece == nullptr && squares[posX - 3 + 8 * posY]->piece == nullptr)
 	{
 		AddMove(squares, squares[posX - 2 + 8 * posY], checkCheck);
 	}
@@ -47,13 +47,13 @@ bool King::Move(Square* square, Square* squares[64])
 
 		if (square == move)
 		{
-			if (!_hasMoved && square == squares[posX+2+8*posY])
+			if (!hasMoved && square == squares[posX+2+8*posY])
 			{
 				squares[posX + 3 + 8 * posY]->piece->posX -= 2;
 				squares[posX + 1 + 8 * posY]->piece = squares[posX + 3 + 8 * posY]->piece;
 				squares[posX + 1 + 8 * posY]->piece->texturePosition = Rectangle{ (float)squares[posX + 1 + 8 * posY]->piece->posX * move->width, (float)squares[posX + 1 + 8 * posY]->piece->posY * move->height, (float)move->width, (float)move->height };
 				squares[posX + 3 + 8 * posY]->piece = nullptr;
-				_hasMoved = true;
+				hasMoved = true;
 				squares[posX + posY * 8]->piece = nullptr;
 
 				posX = move->x;
@@ -66,13 +66,13 @@ bool King::Move(Square* square, Square* squares[64])
 				return true;
 			}
 
-			if (!_hasMoved && square == squares[posX - 2 + 8 * posY])
+			if (!hasMoved && square == squares[posX - 2 + 8 * posY])
 			{
 				squares[posX - 4 + 8 * posY]->piece->posX += 3;
 				squares[posX - 1 + 8 * posY]->piece = squares[posX - 4 + 8 * posY]->piece;
 				squares[posX - 1 + 8 * posY]->piece->texturePosition = Rectangle{ (float)squares[posX - 1 + 8 * posY]->piece->posX * move->width, (float)squares[posX - 1 + 8 * posY]->piece->posY * move->height, (float)move->width, (float)move->height };
 				squares[posX - 4 + 8 * posY]->piece = nullptr;
-				_hasMoved = true;
+				hasMoved = true;
 				squares[posX + posY * 8]->piece = nullptr;
 
 				posX = move->x;
@@ -85,7 +85,7 @@ bool King::Move(Square* square, Square* squares[64])
 				return true;
 			}
 
-			_hasMoved = true;
+			hasMoved = true;
 			squares[posX + posY * 8]->piece = nullptr;
 
 			posX = move->x;

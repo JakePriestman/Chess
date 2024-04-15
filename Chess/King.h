@@ -15,6 +15,5 @@ public:
 
 	virtual void SetCheck(Square* square, Square* squares[64]);
 
-private:
-	bool _hasMoved;
+	bool hasMoved;
 };
