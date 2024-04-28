@@ -13,12 +13,16 @@ void Pawn::CalculatePossibleMoves(Square* squares[64], bool checkCheck)
 {
 	if (isFirstMove && squares[(posY + dy * 2) * 8 + posX]->piece == nullptr && squares[(posY + dy) * 8 + posX]->piece == nullptr)
 		AddMove(squares, squares[(posY + dy * 2) * 8 + posX], checkCheck);
-	if (squares[(posY + dy) * 8 + posX]->piece == nullptr)
-		AddMove(squares, squares[(posY + dy) * 8 + posX], checkCheck);
-	if (squares[(posY + dy) * 8 + posX + 1]->piece != nullptr && squares[(posY + dy) * 8 + posX + 1]->piece->colour != colour && posX != 7)
-		AddMove(squares, squares[(posY + dy) * 8 + posX + 1], checkCheck);
-	if (squares[(posY + dy) * 8 + posX - 1]->piece != nullptr && squares[(posY + dy) * 8 + posX - 1]->piece->colour != colour && posX != 0)
-		AddMove(squares, squares[(posY + dy) * 8 + posX - 1], checkCheck);
+
+	if (posY != 0 || posY != 7)
+	{
+		if (squares[(posY + dy) * 8 + posX]->piece == nullptr)
+			AddMove(squares, squares[(posY + dy) * 8 + posX], checkCheck);
+		if (squares[(posY + dy) * 8 + posX + 1]->piece != nullptr && squares[(posY + dy) * 8 + posX + 1]->piece->colour != colour && posX != 7)
+			AddMove(squares, squares[(posY + dy) * 8 + posX + 1], checkCheck);
+		if (squares[(posY + dy) * 8 + posX - 1]->piece != nullptr && squares[(posY + dy) * 8 + posX - 1]->piece->colour != colour && posX != 0)
+			AddMove(squares, squares[(posY + dy) * 8 + posX - 1], checkCheck);
+	}
 }
 
 bool Pawn::Move(Square* square, Square* squares[64])
@@ -35,6 +39,7 @@ bool Pawn::Move(Square* square, Square* squares[64])
 
 			if (move->y == 0 || move->y == 7)
 			{
+				move->piece = nullptr;
 				move->piece = new Queen{ posX, posY, colour, move->width, move->height };
 			}
 			else
