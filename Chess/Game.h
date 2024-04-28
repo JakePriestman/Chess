@@ -19,7 +19,8 @@ public:
 
 	static Texture2D textureSheet;
 
-	Sound moveSound, captureSound, castleSound, checkSound;
+	Sound moveSound, captureSound, castleSound, checkSound, checkmateSound, promoteSound, gameStartSound;
+	Font font;
 	
 	void Init(int width, int height, const char* title, int fps);
 	void InitPieces();
@@ -27,8 +28,11 @@ public:
 	void HandleEvents();
 	void Render();
 	void Clean();
+	bool MoveResolvesCheck(Piece* activePiece, Board board, Square* move, Piece* king);
+	void ContinueTurn(Piece* king);
 	void Run(int width, int height, const char* title, int fps);
 
 private:
 	const char* _turn;
+	bool _checkmate;
 };
