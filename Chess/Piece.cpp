@@ -45,66 +45,19 @@ void Piece::HidePossibleMoves(Square* squares[64])
 	}
 }
 
-void Piece::Swap(Square* squares[64], Square* move)
-{
-	move->piece = this;
-	squares[posX + posY * 8]->piece = nullptr;
-	posX = move->x;
-	posY = move->y;
-}
-
 void Piece::AddMove(Square* squares[64], Square* move, bool checkCheck)
 {
-	/*if (!checkCheck)*/
-		validMoves.push_back(move);
-
-	/*else
-	{
-		King* _king = static_cast<King*>(king->piece);
-
-		_king->SetCheck(king, squares);
-		Piece* piece = &(*move->piece);
-		int x = posX;
-		int y = posY;
-
-		if (piece != nullptr)
-			move->piece = nullptr;
-
-		Swap(squares, move);
-
-		if (name == "KING")
-			_king->SetCheck(move, squares);
-		else
-			_king->SetCheck(king, squares);
-
-		Swap(squares, squares[x + 8 * y]);
-
-		if (piece != nullptr)
-			move->piece = &(*piece);
-
-		if (!king->piece->isInCheck)
-			validMoves.push_back(move);
-
-		_king->SetCheck(king, squares);
-	}*/
+	validMoves.push_back(move);
 }
 
-Square* Piece::GetKing(Square* squares[64], const char* colour = nullptr)
+Square* Piece::GetKing(Square* squares[64], const char* colour)
 {
 	for (int i = 0 ; i < 64; i++)
 	{
 		if (squares[i]->piece != nullptr)
 		{
-			if (colour == nullptr)
-			{
-				if (squares[i]->piece->GetType() == "KING" && squares[i]->piece->colour == this->colour)
-					return squares[i];
-			}
-			else
-			{
-				if (squares[i]->piece->GetType() == "KING" && squares[i]->piece->colour == colour)
-					return squares[i];
-			}
+			if (squares[i]->piece->GetType() == "KING" && squares[i]->piece->colour == colour)
+				return squares[i];
 		}
 	}
 }

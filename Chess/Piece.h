@@ -58,13 +58,11 @@ public:
 
 	std::vector<Square*> GetPossibleMoves() { return validMoves; };
 
-	void Swap(Square* squares[64], Square* move);
-
 	virtual bool Move(Square* square, Square* squares[64]) { return false; };
 
-	virtual void SetCheck(Square* square, Square* squares[64]) { };
+	virtual void SetCheck(Square* squares[64]) { };
 
-	Square* GetKing(Square* squares[64], const char* colour);
+	static Square* GetKing(Square* squares[64], const char* colour);
 
 	bool IsHeld()
 	{
