@@ -13,7 +13,7 @@ public:
 
 	virtual bool Move(Square* square, Square* squares[64]);
 
-	virtual void SetCheck(Square* square, Square* squares[64]);
+	virtual void SetCheck(Square* squares[64]);
 
 	bool hasMoved;
 };

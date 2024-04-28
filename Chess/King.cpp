@@ -101,7 +101,7 @@ bool King::Move(Square* square, Square* squares[64])
 	return false;
 }
 
-void King::SetCheck(Square* square, Square* squares[64])
+void King::SetCheck(Square* squares[64])
 {
 	for (int i = 0; i < 64; i++)
 	{
