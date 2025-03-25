@@ -114,6 +114,7 @@ void King::SetCheck(Square* squares[64])
 					if (abs(squares[i]->x - posX) <= 1 && abs(squares[i]->y - posY) <= 1)
 					{
 						isInCheck = true;
+						//HIGHTLIGHT KING WHEN IN CHECK
 						return;
 					}
 				}
@@ -125,18 +126,20 @@ void King::SetCheck(Square* squares[64])
 					if ((posX == squares[i]->x + 1 || posX == squares[i]->x - 1) && posY == squares[i]->y - dyPawn)
 					{
 						isInCheck = true;
+						//HIGHTLIGHT KING WHEN IN CHECK
 						return;
 					}
 				}
 
 				else
 				{
-					squares[i]->piece->GetPossibleMoves();
+					squares[i]->piece->GetPossibleMoves(); //TODO: Don't allow king to move through check!
 					for (auto& move : squares[i]->piece->validMoves)
 					{
 						if (move->x == posX && move->y == posY)
 						{
 							isInCheck = true;
+							//HIGHTLIGHT KING WHEN IN CHECK
 							return;
 						}
 					}
@@ -145,5 +148,4 @@ void King::SetCheck(Square* squares[64])
 		}	
 	}
 	isInCheck = false;
-	std::cout << this->colour << "King:" << isInCheck << "\n";
 }

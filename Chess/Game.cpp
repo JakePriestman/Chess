@@ -154,11 +154,6 @@ bool Game::MoveResolvesCheck(Piece* activePiece, Board board, Square* move, Piec
 	return true;
 }
 
-void Game::ContinueTurn(Piece* king)
-{
-	
-}
-
 void Game::HandleEvents()
 {
 	for (auto& square : board.squares)
@@ -199,7 +194,9 @@ void Game::HandleEvents()
 		}
 
 
-		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && activePiece) //We have either dropped the piece at the move or clicked on the move
+		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && activePiece) //We have either dropped the piece at the move or clicked on the move 
+
+			//TODO: Make the clicking functionality work when taking a piece!
 		{
 			Square* move = board.GetSquare(GetMouseX(), GetMouseY());
 			Piece* otherKing = Piece::GetKing(board.squares, activePiece->colour == "WHITE" ? "BLACK" : "WHITE")->piece;
