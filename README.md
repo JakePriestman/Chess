@@ -9,6 +9,8 @@ A C++ chess game using raylib for rendering — a simple, lightweight implementa
 - Uses raylib for graphics — easy to compile and run on multiple platforms  
 - Simple, minimalistic visuals and straightforward gameplay  
 
+---
+
 ## 🛠️ Installation & Build Instructions
 
 1. Clone this repository:  
@@ -24,6 +26,8 @@ A C++ chess game using raylib for rendering — a simple, lightweight implementa
     Run the .exe and enjoy the game.
 
     💡 Note: Ensure you have raylib installed (and linked properly) if your environment requires manual setup.
+
+---
 
 🎮 Usage / Example
 
