@@ -19,20 +19,20 @@ public:
 
 	static Texture2D textureSheet;
 
-	Sound moveSound, captureSound, castleSound, checkSound, checkmateSound, promoteSound, gameStartSound;
+	Sound moveSound, captureSound, castleSound, checkSound, checkmateSound, promoteSound, gameStartSound, invalidMoveSound, gameDraw;
 	Font font;
 	
 	void Init(int width, int height, const char* title, int fps);
 	void InitPieces();
-	void HandleSound(bool exchange, Piece* king, bool kingHasMoved);
+	void HandleSound(bool exchange, Piece* king, bool kingHasMoved, bool invalidMove);
 	void HandleEvents();
+	void FlashCheckSquare(Piece* king);
 	void Render();
 	void Clean();
 	bool MoveResolvesCheck(Piece* activePiece, Board board, Square* move, Piece* king);
-	void ContinueTurn(Piece* king);
 	void Run(int width, int height, const char* title, int fps);
 
 private:
 	const char* _turn;
-	bool _checkmate;
+	bool _checkmate, _stalemate;
 };

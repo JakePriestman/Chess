@@ -37,15 +37,23 @@ void Game::InitPieces()
 
 }
 
-void Game::HandleSound(bool exchange, Piece* king, bool kingHasMoved)
+void Game::HandleSound(bool exchange, Piece* king, bool kingHasMoved, bool invalidMove)
 {
-	if (_checkmate)
+	if (invalidMove)
+		PlaySound(invalidMoveSound);
+
+	else if (_stalemate) 
+	{
+		PlaySound(gameDraw);
+	}
+
+	else if (_checkmate)
 	{
 		PlaySound(checkmateSound);
 		PlaySound(checkSound);
 	}
 
-	else if (activePiece->name == "PAWN" && activePiece->posY == 0 || activePiece->posY == 7)
+	else if (activePiece->name == "PAWN" && (activePiece->posY == 0 || activePiece->posY == 7))
 	{
 		PlaySound(promoteSound);
 
@@ -83,6 +91,7 @@ void Game::Init(int width, int height, const char* title, int fps)
 
 	_turn = "WHITE";
 	_checkmate = false;
+	_stalemate = false;
 
 	board = Board{ GetRenderWidth() /8, GetRenderHeight() /8};
 
@@ -93,8 +102,10 @@ void Game::Init(int width, int height, const char* title, int fps)
 	castleSound = LoadSound("Assets/castle.mp3");
 	checkSound = LoadSound("Assets/move-check.mp3");
 	checkmateSound = LoadSound("Assets/game-end.mp3");
+	gameDraw = LoadSound("Assets/game-draw.mp3");
 	promoteSound = LoadSound("Assets/promote.mp3");
 	gameStartSound = LoadSound("Assets/game-start.mp3");
+	invalidMoveSound = LoadSound("Assets/illegal.mp3");
 
 	InitPieces();
 
@@ -217,6 +228,9 @@ void Game::HandleEvents()
 				if (resolvedCheck)
 					hasMoved = activePiece->Move(move, board.squares);
 
+				else if (!resolvedCheck)
+					HandleSound(false, king, false, true);
+
 				if (hasMoved)
 				{
 					for (auto& square : board.squares)
@@ -244,7 +258,7 @@ void Game::HandleEvents()
 									if (resolvedCheck)
 									{
 										otherKing->SetCheck(board.squares);
-										HandleSound(exchange, otherKing, kingHasMoved);
+										HandleSound(exchange, otherKing, kingHasMoved, false);
 
 										activePiece = nullptr;
 										_turn = _turn == "WHITE" ? "BLACK" : "WHITE";
@@ -256,24 +270,46 @@ void Game::HandleEvents()
 							}
 						}
 
-						//CHECKMATE
 						_checkmate = true;
-						HandleSound(exchange, otherKing, kingHasMoved);
+						HandleSound(exchange, otherKing, kingHasMoved, false);
 						activePiece = nullptr;
 					}
-					
-					else
-					{
-						HandleSound(exchange, otherKing, kingHasMoved);
 
+					else {
+
+						for (auto& square : board.squares)
+						{
+							if (square->piece && square->piece->colour == otherKing->colour)
+							{
+								for (int i = 0; i < square->piece->validMoves.size(); i++)
+								{
+									bool resolvedCheck = MoveResolvesCheck(square->piece, board, square->piece->validMoves[i], otherKing);
+
+									if (resolvedCheck)
+									{
+										otherKing->SetCheck(board.squares);
+										HandleSound(exchange, otherKing, kingHasMoved, false);
+
+										activePiece = nullptr;
+										_turn = _turn == "WHITE" ? "BLACK" : "WHITE";
+										return;
+									}
+									else
+										continue;
+								}
+							}
+						}
+
+						_stalemate = true;
+						HandleSound(exchange, otherKing, kingHasMoved, false);
 						activePiece = nullptr;
-						_turn = _turn == "WHITE" ? "BLACK" : "WHITE";
 					}
 				}
 				else
 				{
 					activePiece->texturePosition.x = activePiece->posX * board.squareWidth;
 					activePiece->texturePosition.y = activePiece->posY * board.squareHeight;
+					king->SetCheck(board.squares);
 				}
 			}
 
@@ -281,6 +317,7 @@ void Game::HandleEvents()
 			{
 				activePiece->texturePosition.x = activePiece->posX * board.squareWidth;
 				activePiece->texturePosition.y = activePiece->posY * board.squareHeight;
+				king->SetCheck(board.squares);
 			}
 		}
 	}
@@ -298,6 +335,12 @@ void Game::Render()
 	{
 		if (square->piece != nullptr)
 		{
+			if (square->piece->name == "KING")
+			{
+				if (square->piece->isInCheck)
+					DrawRectangleLines(square->piece->texturePosition.x, square->piece->texturePosition.y, 80, 80, RED);
+			}
+
 			square->piece->Draw(square->piece->texturePosition.x, square->piece->texturePosition.y, board.squareWidth, board.squareHeight, board.piecesTextureSheet);
 			//Draw hitbox
 			//DrawRectangle(square->piece->texturePosition.x, square->piece->texturePosition.y, 80, 80, BLUE);
@@ -307,6 +350,12 @@ void Game::Render()
 	//Draw active piece last.
 	if(activePiece)
 		activePiece->Draw(activePiece->texturePosition.x, activePiece->texturePosition.y, board.squareWidth, board.squareHeight, board.piecesTextureSheet);
+
+	if (_stalemate) 
+	{
+		DrawRectangle(60, 60, GetRenderWidth() - 120, GetRenderHeight() - 120, { 0, 0, 0, 200 });
+		DrawText("STALEMATE", GetRenderWidth() / 2 - 150, GetRenderHeight() / 2 - 48, 48, WHITE);
+	}
 
 	if (_checkmate)
 	{
@@ -335,10 +384,10 @@ void Game::Run(int width, int height, const char* title, int fps)
 
 	while (!WindowShouldClose())
 	{
-		if(!_checkmate)
+		if(!_checkmate && !_stalemate)
 			HandleEvents();
 		Render();
 	}
 
-	this->Clean();
+	Clean();
 }
