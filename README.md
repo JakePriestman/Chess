@@ -51,5 +51,5 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 ---
 
-##Examples
+## 📸 Examples
 ![image](https://github.com/JakePriestman/Chess/assets/84022353/28f4eb54-f566-4cae-9c54-8362df4ac3ec)
