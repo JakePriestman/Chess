@@ -173,10 +173,12 @@ void Game::HandleEvents()
 				}
 			}
 
-			else if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(GetMousePosition(), square->piece->texturePosition)) // we clicked on another piece while a piece is active
+			else if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(GetMousePosition(), square->piece->texturePosition) && square->piece->colour == activePiece->colour) // we clicked on another piece while a piece is active
 			{
 				activePiece->HidePossibleMoves(board.squares);
-				activePiece = nullptr;
+				activePiece = square->piece;
+				activePiece->ShowPossibleMoves(board.squares);
+				break;
 			}
 
 			else if (square->piece->IsHeld() && square->piece->colour == _turn && GetMouseX() < GetRenderWidth() && GetMouseY() < GetRenderHeight() && GetMouseX() > 0 && GetMouseY() > 0) //We're holding the active piece
@@ -195,8 +197,6 @@ void Game::HandleEvents()
 
 
 		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && activePiece) //We have either dropped the piece at the move or clicked on the move 
-
-			//TODO: Make the clicking functionality work when taking a piece!
 		{
 			Square* move = board.GetSquare(GetMouseX(), GetMouseY());
 			Piece* otherKing = Piece::GetKing(board.squares, activePiece->colour == "WHITE" ? "BLACK" : "WHITE")->piece;
@@ -231,7 +231,7 @@ void Game::HandleEvents()
 					otherKing->SetCheck(board.squares);
 					king->SetCheck(board.squares);
 
-					if (otherKing->isInCheck) //HERE WE CHECK IF THERE ARE ANY MORE VALID MOVES AND IF NOT THEN WE HAVE CHECK MATE.
+					if (otherKing->isInCheck) //HERE WE CHECK IF THERE ARE ANY MORE VALID MOVES AND IF NOT THEN WE HAVE CHECKMATE.
 					{
 						for (auto& square : board.squares)
 						{
