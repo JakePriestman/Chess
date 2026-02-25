@@ -218,18 +218,61 @@ void Game::HandleEvents()
 				bool exchange = move->piece;
 				bool hasMoved = false;
 				bool kingHasMoved = false;
+				bool resolvesCheck = false;
 
-				if (activePiece->name == "KING")
-					kingHasMoved = static_cast<King*>(activePiece)->hasMoved; //just for the sound, can this be improved?
+				if (activePiece->name == "KING") {
+					King* mappedKing = static_cast<King*>(activePiece);
 
+					kingHasMoved = mappedKing->hasMoved; //just for the sound, can this be improved?
 
-				bool resolvedCheck = MoveResolvesCheck(activePiece, board, move, king);
+					//Check move inbetween for castling
+					if (activePiece->posX + 2 == move->x || activePiece->posX - 2 == move->x) {
 
-				if (resolvedCheck)
-					hasMoved = activePiece->Move(move, board.squares);
+						int x = activePiece->posX + 2 == move->x ? activePiece->posX + 1 : activePiece->posX - 1;
 
-				else if (!resolvedCheck)
-					HandleSound(false, king, false, true);
+						Square* inbetweenMove = board.GetSquare(x * board.squareWidth, activePiece->posY * board.squareHeight);
+
+						Piece *piece = inbetweenMove->piece;
+
+						mappedKing->hasMoved = true;
+
+						inbetweenMove->piece = static_cast<Piece*>(mappedKing);
+
+						resolvesCheck = MoveResolvesCheck(activePiece, board, inbetweenMove, king);
+
+						if (!resolvesCheck) {
+							mappedKing->hasMoved = false;
+							inbetweenMove->piece = piece;
+							HandleSound(false, king, false, true);
+						}
+
+						else {
+							mappedKing->hasMoved = false;
+							inbetweenMove->piece = piece;
+							activePiece->validMoves.clear();
+							activePiece->CalculatePossibleMoves(board.squares, true);
+							hasMoved = activePiece->Move(move, board.squares);
+						}
+					}
+					else {
+						resolvesCheck = MoveResolvesCheck(activePiece, board, move, king);
+
+						if (resolvesCheck)
+							hasMoved = activePiece->Move(move, board.squares);
+
+						else if (!resolvesCheck)
+							HandleSound(false, king, false, true);
+					}
+				}
+				else {
+					resolvesCheck = MoveResolvesCheck(activePiece, board, move, king);
+
+					if (resolvesCheck)
+						hasMoved = activePiece->Move(move, board.squares);
+
+					else if (!resolvesCheck)
+						HandleSound(false, king, false, true);
+				}
 
 				if (hasMoved)
 				{
@@ -309,6 +352,8 @@ void Game::HandleEvents()
 				{
 					activePiece->texturePosition.x = activePiece->posX * board.squareWidth;
 					activePiece->texturePosition.y = activePiece->posY * board.squareHeight;
+					activePiece->validMoves.clear();
+					activePiece->CalculatePossibleMoves(board.squares, true);
 					king->SetCheck(board.squares);
 				}
 			}
