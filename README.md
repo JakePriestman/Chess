@@ -1,6 +1,7 @@
 # ♟️Chess
 
 A C++ chess game using raylib for rendering — a simple, lightweight implementation of Chess that you can build and run locally.
+I used this as a project to learn some C++. Therefore, this could be way better!
 
 ## 🚀 Features
 
